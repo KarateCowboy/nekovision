@@ -13,7 +13,6 @@ void main() {
 
       final result = from_json(sample_json);
 
-      // Verify that the returned VideoThumbnail object has the expected values
       expect(result.quality, 'high');
       expect(result.url, 'https://example.com/thumbnail.jpg');
       expect(result.width, 1280);

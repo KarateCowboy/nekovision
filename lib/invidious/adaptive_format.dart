@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
-class AdaptiveFormat {
+final class AdaptiveFormat {
   final String index;
   final String bitrate;
   final String init;
@@ -9,7 +9,7 @@ class AdaptiveFormat {
   final String type;
   final String clen;
   final String lmt;
-  final int projection_type;
+  final String projection_type;
   final String container;
   final String encoding;
   final Option<String> quality_label;

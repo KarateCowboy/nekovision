@@ -1,5 +1,5 @@
 
-class VideoThumbnail {
+final class VideoThumbnail {
   final String quality;
   final String url;
   final int width;

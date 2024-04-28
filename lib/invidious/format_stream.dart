@@ -1,4 +1,4 @@
-class FormatStream {
+final class FormatStream {
   final String url;
   final String itag;
   final String type;

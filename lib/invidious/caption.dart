@@ -1,4 +1,4 @@
-class Caption {
+final class Caption {
   final String label;
   final String language_code;
   final String url;
@@ -12,7 +12,7 @@ class Caption {
 
 Caption from_json(Map<String, dynamic> json) {
   return Caption(
-    language_code: json['languageCode'],
+    language_code: json['language_code'],
     label: json['label'],
     url: json['url'],
   );

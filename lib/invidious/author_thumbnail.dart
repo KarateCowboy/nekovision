@@ -1,4 +1,4 @@
-class AuthorThumbnail {
+final class AuthorThumbnail {
   final String url;
   final int width;
   final int height;

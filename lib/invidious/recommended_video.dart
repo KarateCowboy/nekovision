@@ -1,7 +1,7 @@
 
 import 'video_thumbnail.dart' as vt;
 
-class RecommendedVideo {
+final class RecommendedVideo {
   final String video_id;
   final String title;
   final List<vt.VideoThumbnail> video_thumbnails;

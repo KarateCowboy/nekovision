@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'package:nekovision/invidious/recommended_video.dart';
-import 'package:nekovision/invidious/video_thumbnail.dart';
 
 import 'author_thumbnail.dart' as at;
-import 'caption.dart' as c ;
-import 'format_stream.dart'  as fs;
-import 'video.dart' as v;
+import 'caption.dart' as c;
+import 'format_stream.dart' as fs;
 import 'adaptive_format.dart' as af;
-import 'video_thumbnail.dart'  as vtn;
+import 'video_info.dart' as vi;
+import 'video_thumbnail.dart' as vtn;
 import 'recommended_video.dart' as rv;
 
 String hello_invidious() {
@@ -53,17 +51,20 @@ String hello_invidious() {
 //       });
 //     };
 
+typedef Rack = (int leftBoob, int rightBoob);
 
-VideoInfo parseVideoInfo(String jsonString) {
+const Rack niceRack = (40, 40);
+
+vi.VideoInfo parseVideoInfo(String jsonString) {
   final Map<String, dynamic> json = jsonDecode(jsonString);
-  return fromJson(json);
+  return from_json(json);
 }
 
-VideoInfo from_json(Map<String, dynamic> json) {
-  return VideoInfo(
+vi.VideoInfo from_json(Map<String, dynamic> json) {
+  return vi.VideoInfo(
     title: json['title'],
     video_id: json['videoId'],
-    video_thumbnails: List<VideoThumbnail>.from(
+    video_thumbnails: List<vtn.VideoThumbnail>.from(
         json['videoThumbnails'].map((x) => vtn.from_json(x))),
     description: json['description'],
     description_html: json['descriptionHtml'],
@@ -97,24 +98,8 @@ VideoInfo from_json(Map<String, dynamic> json) {
         json['adaptiveFormats'].map((x) => af.from_json(x))),
     format_streams: List<fs.FormatStream>.from(
         json['formatStreams'].map((x) => fs.from_json(x))),
-    captions:
-        List<c.Caption>.from(json['captions'].map((x) => c.from_json(x))),
-    recommended_videos: List<RecommendedVideo>.from(
+    captions: List<c.Caption>.from(json['captions'].map((x) => c.from_json(x))),
+    recommended_videos: List<rv.RecommendedVideo>.from(
         json['recommendedVideos'].map((x) => rv.from_json(x))),
   );
 }
-
-// xfactory
-// VideoThumbnail.fromJson
-// (
-// Map<String, dynamic> json) {
-// return VideoThumbnail(
-// quality: json['quality'],
-// url: json['url'],
-// width: json['width'],
-// height: json['height'],
-// );
-// }
-// }
-
-// Repeat the pattern for AuthorThumbnail, AdaptiveFormat, FormatStream, Caption, and RecommendedVideo classes...

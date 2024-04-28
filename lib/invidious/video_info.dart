@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'video_thumbnail.dart' as vt;
 
@@ -8,7 +9,7 @@ import 'format_stream.dart' as fs;
 import 'recommended_video.dart' as rv;
 
 
-class VideoInfo {
+final class VideoInfo {
   final String title;
   final String video_id;
   final List<vt.VideoThumbnail> video_thumbnails;
@@ -83,6 +84,7 @@ class VideoInfo {
 }
 
 VideoInfo from_json(Map<String, dynamic> json) {
+  // debugPrint(json['allowedRegions'].toString());
   return VideoInfo(
     title: json['title'],
     video_id: json['videoId'],
@@ -91,14 +93,14 @@ VideoInfo from_json(Map<String, dynamic> json) {
     description_html: json['descriptionHtml'],
     published: json['published'],
     published_test: json['publishedText'],
-    keywords: List<String>.from(json['keywords']),
+    keywords: List<String>.from(json['keywords'].map((x) => x.toString())),
     view_count: json['viewCount'],
     like_count: json['likeCount'],
     dislike_count: json['dislikeCount'],
     paid: json['paid'],
     premium: json['premium'],
     is_family_friendly: json['isFamilyFriendly'],
-    allowed_regions: List<String>.from(json['allowedRegions']),
+    allowed_regions: List<String>.from(json['allowedRegions'].map((x) => x.toString())),
     genre: json['genre'],
     genre_url: json['genreUrl'],
     author: json['author'],
