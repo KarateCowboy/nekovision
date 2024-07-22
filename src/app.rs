@@ -62,21 +62,12 @@ pub fn app() -> Html {
     html! {
         <main class="container">
             <div class="row">
-                <a href="https://tauri.app" target="_blank">
-                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-                </a>
-                <a href="https://yew.rs" target="_blank">
-                    <img src="public/yew.png" class="logo yew" alt="Yew logo"/>
-                </a>
+                <form class="row" onsubmit={greet}>
+                    <input id="search" placeholder="Search for..." />
+                    <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
+                    <button type="submit">{"Greet"}</button>
+                </form>
             </div>
-
-            <p>{"Click on the Tauri and Yew logos to learn more."}</p>
-
-            <form class="row" onsubmit={greet}>
-                <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
-                <button type="submit">{"Greet"}</button>
-            </form>
-
             <p><b>{ &*greet_msg }</b></p>
         </main>
     }
