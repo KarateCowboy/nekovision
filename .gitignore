@@ -1,3 +1,4 @@
 /dist/
 /target/
 /Cargo.lock
+/ui-tests/node_modules/
