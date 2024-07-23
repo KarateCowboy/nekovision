@@ -4,5 +4,5 @@ Feature: Search and Results
 
   Scenario: User searches for a video
     Given I am on the main page
-      When I search for <Smidget Freestyle Don't bother me>
+      When I search for Smidget Freestyle Don't bother me
       Then I should see a list of videos matching the search term
