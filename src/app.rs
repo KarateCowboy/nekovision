@@ -1,8 +1,14 @@
+use std::ops::Deref;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use yew::Properties;
+
+// use crate::update::Message::Navigate;
+// use crate::update::*;
+// use crate::update::Page::SearchResults;
 
 #[wasm_bindgen]
 extern "C" {
@@ -10,67 +16,108 @@ extern "C" {
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
 }
 
-#[derive(Serialize, Deserialize)]
-struct GreetArgs<'a> {
-    name: &'a str,
+/////////////////////////////////////////////////////////////////////////////////////
+// Structs
+/////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Eq, PartialEq, Debug)]
+pub enum Message {
+    Navigate(Page),
+    None,
+}
+
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub enum Page {
+    Main,
+    SearchResults,
+    NotFound,
+}
+
+#[derive(Eq, PartialEq, Clone, Debug, Properties)]
+pub struct State {
+    pub current_page: Page,
 }
 
 
+pub fn dispatch(message: Message, state: &UseStateHandle<State>) {
+    let current_state = state.deref().clone();
+    let (new_state, _) = update(current_state, message);
+    state.set(new_state);
+}
+
+pub async fn update(app_state: State, message: Message) -> (State, Message) {
+    match message {
+        Message::Navigate(page) => (State { current_page: page }, Message::None),
+        Message::None => (app_state, Message::None),
+    }
+}
+
+#[derive(PartialEq, Properties)]
+pub struct ProviderProps {
+    pub children: Children,
+}
+
+#[function_component(StateProvider)]
+pub fn state_provider(props: &ProviderProps) -> Html {
+    let state = use_state(|| State { current_page: Page::Main });
+
+    let context = use_memo(|_| state.clone(), ());
+
+    html! {
+        <ContextProvider<UseStateHandle<State>> context={context}>
+            { props.children.clone() }
+        </ContextProvider<UseStateHandle<State>>>
+    }
+}
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let greet_input_ref = use_node_ref();
+    let state = use_context::<UseStateHandle<State>>().expect("no ctx found");
 
-    let name = use_state(|| String::new());
-
-    let greet_msg = use_state(|| String::new());
-    {
-        let greet_msg = greet_msg.clone();
-        let name = name.clone();
-        let name2 = name.clone();
-        use_effect_with(
-            name2,
-            move |_| {
-                spawn_local(async move {
-                    if name.is_empty() {
-                        return;
-                    }
-
-                    let args = to_value(&GreetArgs { name: &*name }).unwrap();
-                    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-                    let new_msg = invoke("greet", args).await.as_string().unwrap();
-                    greet_msg.set(new_msg);
-                });
-
-                || {}
-            },
-        );
-    }
-
-    let greet = {
-        let name = name.clone();
-        let greet_input_ref = greet_input_ref.clone();
-        Callback::from(move |e: SubmitEvent| {
-            e.prevent_default();
-            name.set(
-                greet_input_ref
-                    .cast::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value(),
-            );
-        })
+    let onclick = {
+        let state = state.clone();
+        Callback::from(move |_| dispatch(Message::Navigate(Page::SearchResults), &state))
     };
 
     html! {
-        <main class="container">
-            <div class="row">
-                <form class="row" onsubmit={greet}>
-                    <input id="search" placeholder="Search for..." />
-                    <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
-                    <button type="submit">{"Greet"}</button>
-                </form>
-            </div>
-            <p><b>{ &*greet_msg }</b></p>
-        </main>
+        <page>
+            <input type="text" placeholder="Search for time wasters..."/>
+            <button {onclick}>{ "Search" }</button>
+        </page>
+    }
+}
+
+#[function_component(Root)]
+pub fn root() -> Html {
+    html! {
+        <StateProvider>
+            <App />
+        </StateProvider>
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+// View components
+/////////////////////////////////////////////////////////////////////////////////////
+
+#[function_component(Home)]
+fn home() -> Html {
+    html! {
+        <h1>{"Welcome to Tauri App"}</h1>
+    }
+}
+
+#[function_component(SearchResults)]
+fn search_results() -> Html {
+    html! {
+        <h1>{"Search Results Page"}</h1>
+    }
+}
+
+#[function_component(NotFound)]
+fn not_found() -> Html {
+    html! {
+        <h1>{"404 Not Found"}</h1>
     }
 }
