@@ -38,10 +38,9 @@ pub struct State {
     pub current_page: Page,
 }
 
-
-pub fn dispatch(message: Message, state: &UseStateHandle<State>) {
+pub async fn dispatch(message: Message, state: &UseStateHandle<State>) {
     let current_state = state.deref().clone();
-    let (new_state, _) = update(current_state, message);
+    let (new_state, _) =  update(current_state, message).await;
     state.set(new_state);
 }
 
@@ -57,45 +56,28 @@ pub struct ProviderProps {
     pub children: Children,
 }
 
-#[function_component(StateProvider)]
-pub fn state_provider(props: &ProviderProps) -> Html {
-    let state = use_state(|| State { current_page: Page::Main });
-
-    let context = use_memo(|_| state.clone(), ());
-
-    html! {
-        <ContextProvider<UseStateHandle<State>> context={context}>
-            { props.children.clone() }
-        </ContextProvider<UseStateHandle<State>>>
-    }
-}
-
 #[function_component(App)]
 pub fn app() -> Html {
-    let state = use_context::<UseStateHandle<State>>().expect("no ctx found");
+    let ctx = use_state(|| State { current_page: Page::Main });
 
     let onclick = {
-        let state = state.clone();
-        Callback::from(move |_| dispatch(Message::Navigate(Page::SearchResults), &state))
+        let ctx = ctx.clone();
+        Callback::from(move |_| {
+            let ctx = ctx.clone();
+            spawn_local(async move {
+                dispatch(Message::Navigate(Page::SearchResults), &ctx).await;
+            });
+        })
     };
-
     html! {
+        <ContextProvider<State> context={(*ctx).clone()}>
         <page>
             <input type="text" placeholder="Search for time wasters..."/>
-            <button {onclick}>{ "Search" }</button>
+            <button{onclick} >{ "Search" }</button>
         </page>
+        </ContextProvider<State>>
     }
 }
-
-#[function_component(Root)]
-pub fn root() -> Html {
-    html! {
-        <StateProvider>
-            <App />
-        </StateProvider>
-    }
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 // View components
