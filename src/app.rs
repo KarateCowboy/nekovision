@@ -40,6 +40,7 @@ pub async fn dispatch(message: Message, state: &UseStateHandle<State>) {
 
     let current_state = state.deref().clone();
     let (new_state, _) = update(current_state, message).await;
+    web_sys::console::log_1(&String::from("dispatching").into()); // if uncommented will print
     state.set(new_state);
 }
 
@@ -75,8 +76,12 @@ pub fn app() -> Html {
     html! {
         <ContextProvider<State> context={(*ctx).clone()}>
         <page>
+         if ctx.current_page == Page::Main {
             <input type="text" placeholder="Search for time wasters..."/>
             <button {onclick} >{ "Search" }</button>
+        }else {
+            <Partial />
+        }
         </page>
         </ContextProvider<State>>
     }
@@ -90,6 +95,18 @@ pub fn app() -> Html {
 fn home() -> Html {
     html! {
         <h1>{"Welcome to Tauri App"}</h1>
+    }
+}
+
+#[function_component(Partial)]
+fn partial() -> Html {
+    let ctx = use_context::<State>().expect("blarg");
+    let some_str = String::from("Some string");
+    html! {
+        <div>
+           <div>{ format!("{:?}",ctx.current_page) }</div>
+           <h1>{"This is a partial component "}</h1>
+        </div>
     }
 }
 
