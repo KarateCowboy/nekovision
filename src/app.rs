@@ -5,10 +5,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 use yew::Properties;
-
-// use crate::update::Message::Navigate;
-// use crate::update::*;
-// use crate::update::Page::SearchResults;
+use web_sys;
 
 #[wasm_bindgen]
 extern "C" {
@@ -39,8 +36,10 @@ pub struct State {
 }
 
 pub async fn dispatch(message: Message, state: &UseStateHandle<State>) {
+    web_sys::console::log_1(&String::from("dispatching").into()); // if uncommented will print
+
     let current_state = state.deref().clone();
-    let (new_state, _) =  update(current_state, message).await;
+    let (new_state, _) = update(current_state, message).await;
     state.set(new_state);
 }
 
@@ -61,19 +60,23 @@ pub fn app() -> Html {
     let ctx = use_state(|| State { current_page: Page::Main });
 
     let onclick = {
-        let ctx = ctx.clone();
+        let local_ctx = ctx.clone();
         Callback::from(move |_| {
-            let ctx = ctx.clone();
+            let local_ctx = local_ctx.clone();
             spawn_local(async move {
-                dispatch(Message::Navigate(Page::SearchResults), &ctx).await;
+                let greeting = String::from("hello console");
+                web_sys::console::log_1(&greeting.into()); // if uncommented will print
+                println!("Dispatching");
+                dispatch(Message::Navigate(Page::SearchResults), &local_ctx).await;
             });
         })
     };
+
     html! {
         <ContextProvider<State> context={(*ctx).clone()}>
         <page>
             <input type="text" placeholder="Search for time wasters..."/>
-            <button{onclick} >{ "Search" }</button>
+            <button {onclick} >{ "Search" }</button>
         </page>
         </ContextProvider<State>>
     }
