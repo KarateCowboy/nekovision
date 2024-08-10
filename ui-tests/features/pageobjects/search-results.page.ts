@@ -11,7 +11,7 @@ class SearchResultsPage extends Page {
     }
 
     public get videoList () {
-        return $('ul.video-list');
+        return $('#video-list');
     }
 
     public get searchSubmit () {

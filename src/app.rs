@@ -77,10 +77,10 @@ pub fn app() -> Html {
         <ContextProvider<State> context={(*ctx).clone()}>
         <page>
          if ctx.current_page == Page::Main {
-            <input type="text" placeholder="Search for time wasters..."/>
-            <button {onclick} >{ "Search" }</button>
+            <input type="text" id="search" placeholder="Search for time wasters..."/>
+            <button type="submit" {onclick} >{ "Search" }</button>
         }else {
-            <Partial />
+            <SearchResults />
         }
         </page>
         </ContextProvider<State>>
@@ -112,8 +112,12 @@ fn partial() -> Html {
 
 #[function_component(SearchResults)]
 fn search_results() -> Html {
+    let ctx = use_context::<State>().expect("blarg");
     html! {
-        <h1>{"Search Results Page"}</h1>
+        <page>
+            <h1>{"Search Results Page"}</h1>
+            <ul id="video-list"></ul>
+        </page>
     }
 }
 
