@@ -30,4 +30,8 @@ Then(/^I should see a flash message saying (.*)$/, async (message) => {
 
 Then(/^I should see a list of videos matching the search term$/, async () => {
     await expect(SearchResultsPage.videoList).toBeExisting();
+    const items = await SearchResultsPage.videoListItems;
+    console.dir(items)
+    await expect(items).toHaveProperty('length');
+
 })

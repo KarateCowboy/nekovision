@@ -1,7 +1,7 @@
-mod app;
+mod lib;
 pub mod update;
 
-use app::App;
+use lib::App;
 
 fn main() {
     console_error_panic_hook::set_once();

@@ -14,6 +14,10 @@ class SearchResultsPage extends Page {
         return $('#video-list');
     }
 
+    public get videoListItems () {
+        return $('#video-list li');
+    }
+
     public get searchSubmit () {
         return $('button[type="submit"]');
     }
