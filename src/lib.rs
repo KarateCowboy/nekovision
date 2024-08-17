@@ -1,4 +1,7 @@
 use std::ops::Deref;
+use invidious::hidden::SearchItem;
+use invidious::*;
+use invidious::universal::Search;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
@@ -36,6 +39,14 @@ pub struct State {
     pub current_page: Page,
 }
 
+#[derive(PartialEq, Properties)]
+pub struct ProviderProps {
+    pub children: Children,
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// methods
+/////////////////////////////////////////////////////////////////////////////////////
 
 pub async fn dispatch(message: Message, state: &UseStateHandle<State>) {
     web_sys::console::log_1(&String::from("dispatching").into()); // if uncommented will print
@@ -52,14 +63,15 @@ pub async fn update(app_state: State, message: Message) -> (State, Message) {
             return set_page(&app_state, page.clone());
         }
         Message::Search(query) => (State { current_page: Page::SearchResults(query) }, Message::None),
-        _ => (app_state, Message::None),
         Message::None => (app_state, Message::None),
+        _ => (app_state, Message::None),
     };
     return match new_message {
         Message::None => (new_state, new_message),
         _ => Box::pin(update(new_state, new_message)).await
     };
 }
+
 
 pub fn set_page(state: &State, page: Page) -> (State, Message) {
     return match page {
@@ -69,10 +81,19 @@ pub fn set_page(state: &State, page: Page) -> (State, Message) {
     };
 }
 
-#[derive(PartialEq, Properties)]
-pub struct ProviderProps {
-    pub children: Children,
+pub async fn search(query: &str) -> Result<Vec<SearchItem>, InvidiousError> {
+    let local_query = query.to_owned();
+    let client = ClientAsync::default();
+    let results: Result<Search, InvidiousError> = client.search(Some(&format!("q={}",local_query))).await;
+    return match results {
+        Ok(results) => Ok(results.items),
+        Err(err) => Err(err)
+    }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// View components
+/////////////////////////////////////////////////////////////////////////////////////
 
 #[function_component(App)]
 pub fn app() -> Html {
@@ -105,9 +126,6 @@ pub fn app() -> Html {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-// View components
-/////////////////////////////////////////////////////////////////////////////////////
 
 #[function_component(Home)]
 fn home() -> Html {
