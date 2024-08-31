@@ -2,8 +2,6 @@ use std::ops::Deref;
 use invidious::hidden::SearchItem;
 use invidious::*;
 use invidious::universal::Search;
-use serde::{Deserialize, Serialize};
-use serde_wasm_bindgen::to_value;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -27,11 +25,11 @@ pub enum Message {
     None,
 }
 
+
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub enum Page {
     Main,
     SearchResults(String),
-    NotFound,
 }
 
 #[derive(Eq, PartialEq, Clone, Debug, Properties)]
@@ -64,7 +62,6 @@ pub async fn update(app_state: State, message: Message) -> (State, Message) {
         }
         Message::Search(query) => (State { current_page: Page::SearchResults(query) }, Message::None),
         Message::None => (app_state, Message::None),
-        _ => (app_state, Message::None),
     };
     return match new_message {
         Message::None => (new_state, new_message),
@@ -77,8 +74,7 @@ pub fn set_page(state: &State, page: Page) -> (State, Message) {
     return match page {
         Page::Main => (State { current_page: Page::Main }, Message::None),
         Page::SearchResults(query) => (State { current_page: Page::SearchResults(query.clone()) }, Message::Search(query.clone())),
-        Page::NotFound => (state.clone(), Message::None)
-    };
+      };
 }
 
 pub async fn search(query: &str) -> Result<Vec<SearchItem>, InvidiousError> {
@@ -137,7 +133,6 @@ fn home() -> Html {
 #[function_component(Partial)]
 fn partial() -> Html {
     let ctx = use_context::<State>().expect("blarg");
-    let some_str = String::from("Some string");
     html! {
         <div>
            <div>{ format!("{:?}",ctx.current_page) }</div>
@@ -148,7 +143,7 @@ fn partial() -> Html {
 
 #[function_component(SearchResults)]
 fn search_results() -> Html {
-    let ctx = use_context::<State>().expect("blarg");
+    //let ctx = use_context::<State>().expect("blarg");
     html! {
         <page>
             <h1>{"Search Results Page"}</h1>
