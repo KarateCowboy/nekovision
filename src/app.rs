@@ -25,23 +25,20 @@ pub fn app() -> Html {
         let greet_msg = greet_msg.clone();
         let name = name.clone();
         let name2 = name.clone();
-        use_effect_with(
-            name2,
-            move |_| {
-                spawn_local(async move {
-                    if name.is_empty() {
-                        return;
-                    }
+        use_effect_with(name2, move |_| {
+            spawn_local(async move {
+                if name.is_empty() {
+                    return;
+                }
 
-                    let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &*name }).unwrap();
-                    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-                    let new_msg = invoke("greet", args).await.as_string().unwrap();
-                    greet_msg.set(new_msg);
-                });
+                let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &*name }).unwrap();
+                // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+                let new_msg = invoke("greet", args).await.as_string().unwrap();
+                greet_msg.set(new_msg);
+            });
 
-                || {}
-            },
-        );
+            || {}
+        });
     }
 
     let greet = {
@@ -60,23 +57,27 @@ pub fn app() -> Html {
 
     html! {
         <main class="container">
-            <h1>{"Welcome to Tauri + Yew"}</h1>
+            <h1>{"NekoVision Viewer"}</h1>
+            <h2><i>{"because the content shouldn't watch you back"}</i></h2>
 
             <div class="row">
-                <a href="https://tauri.app" target="_blank">
-                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-                </a>
-                <a href="https://yew.rs" target="_blank">
-                    <img src="public/yew.png" class="logo yew" alt="Yew logo"/>
-                </a>
-            </div>
-            <p>{"Click on the Tauri and Yew logos to learn more."}</p>
+                <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/crEz8i6oVpI"
+                    title="Nekovision video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen=false>
+                </iframe>
 
-            <form class="row" onsubmit={greet}>
-                <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
-                <button type="submit">{"Greet"}</button>
-            </form>
-            <p>{ &*greet_msg }</p>
+            </div>
+
+            // <form class="row" onsubmit={greet}>
+            //     <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
+            //     <button type="submit">{"Greet"}</button>
+            // </form>
+            // <p>{ &*greet_msg }</p>
         </main>
     }
 }
