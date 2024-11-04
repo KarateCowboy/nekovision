@@ -1,0 +1,35 @@
+name: Build Quasar Desktop App
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install Quasar CLI
+      run: npm install -g @quasar/cli
+
+    - name: Build for Linux Desktop
+      run: quasar build -m electron
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-desktop-build
+        path: dist/electron/linux-unpacked/  # Adjust this path as needed
+
